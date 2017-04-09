@@ -14,12 +14,6 @@
           <children>
               <TreeView fx:id="treeView" layoutX="99.0" layoutY="115.0" prefHeight="343.0" prefWidth="217.0" />
               <TableView fx:id="tableView" layoutX="340.0" layoutY="115.0" prefHeight="343.0" prefWidth="470.0">
-                  <columns>
-                      <TableColumn prefWidth="75.0" text="Icon" />
-                      <TableColumn prefWidth="75.0" text="Name" />
-                      <TableColumn prefWidth="87.75" text="Size" />
-                      <TableColumn minWidth="0.0" prefWidth="99.0" text="Date of Modification" />
-                  </columns>
                   <columnResizePolicy>
                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                   </columnResizePolicy>
