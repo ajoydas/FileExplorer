@@ -12,7 +12,7 @@
    <children>
        <Pane layoutX="-67.0" prefHeight="500.0" prefWidth="800.0" AnchorPane.bottomAnchor="-45.0" AnchorPane.leftAnchor="-67.0" AnchorPane.rightAnchor="-67.0" AnchorPane.topAnchor="0.0">
           <children>
-              <TreeView fx:id="treeView" layoutX="99.0" layoutY="115.0" prefHeight="343.0" prefWidth="217.0" />
+              <TreeView fx:id="treeView" onMouseClicked="#mouseClicked" layoutX="99.0" layoutY="115.0" prefHeight="343.0" prefWidth="217.0" />
               <TableView fx:id="tableView" layoutX="340.0" layoutY="115.0" prefHeight="343.0" prefWidth="470.0">
                   <columnResizePolicy>
                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

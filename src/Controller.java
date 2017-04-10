@@ -7,6 +7,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -18,6 +19,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 public class Controller implements Initializable {
@@ -36,6 +38,7 @@ public class Controller implements Initializable {
     TreeItem<String> rootNode;
     String hostName="computer";
     ObservableList<FilePathTreeItem> drives;
+    Stack<FilePathTreeItem> backlist;
     Image fileImage = new Image(
             getClass().getResourceAsStream("file-icon.png"));
     Image folderImage = new Image(
@@ -45,7 +48,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         FilePathTreeItem.textField=tCurrDir;
-
+        backlist=new Stack<>();
         /*TreeItem<String> treeItemRoot = new TreeItem<> ("Root");
 
         TreeItem<String> nodeItemA = new TreeItem<>("Item A");
@@ -74,8 +77,7 @@ public class Controller implements Initializable {
         treeView.setShowRoot(false);
         treeView.getSelectionModel().select(nodeItemB2);*/
 
-        System.out.println("Working Directory = " +
-                System.getProperty("user.dir"));
+        System.out.println("Working Directory = " +System.getProperty("user.dir"));
 
 
         try{hostName= InetAddress.getLocalHost().getHostName();}catch(UnknownHostException x){
@@ -89,11 +91,26 @@ public class Controller implements Initializable {
             FilePathTreeItem treeNode=new FilePathTreeItem(name.toFile());
             drives.add(treeNode);
             rootNode.getChildren().add(treeNode);
+
+            /*ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
+
+                System.out.println("Loading files "+treeNode.getFile().toString());
+                FileDetails fileDetails = new FileDetails(new ImageView(getIcon(treeNode)),treeNode.getFile().getName(),
+                        String.valueOf(treeNode.getFile().length()),
+                        String.valueOf(sdf.format(treeNode.getFile().lastModified())),treeNode);
+                //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
+                imgList.add(fileDetails);
+
+            tableView.getItems().clear();
+            tableView.setItems(imgList);*/
         }
 
         treeView.setRoot(rootNode);
-
-        treeView.getSelectionModel().select(getSpecificItem(System.getProperty("user.dir")));
+        FilePathTreeItem currItem=getSpecificItem(System.getProperty("user.dir"));
+        treeView.getSelectionModel().select(currItem);
+        addTableItems(currItem);
+        //backlist.push(currItem);
+        //System.out.println("Stack Pushed -> "+currItem.getFile());
         treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
 
         tableIcon=new TableColumn<FileDetails, ImageView>("Icon");
@@ -127,22 +144,57 @@ public class Controller implements Initializable {
                 {
                     FilePathTreeItem item = getSpecificItem(tCurrDir.getText());
                     addTableItems(item);
+                    //backlist.push(item);
+                   // System.out.println("Stack Pushed -> "+item.getFile());
                 }
-
-
         );
         tableView.setRowFactory( tv -> {
             TableRow<FileDetails> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     FileDetails rowData = row.getItem();
-                    System.out.println(rowData.getItem().getFile());
-                    if(rowData.getItem().isDirectory())addTableItems(rowData.getItem());
+                    //System.out.println(rowData.getItem().getFile());
+                    if(rowData.getItem().isDirectory())
+                    {
+                        addTableItems(rowData.getItem());
+                        //backlist.push(rowData.getItem());
+                        //System.out.println("Stack Pushed -> "+rowData.getItem().getFile());
+                    }
                 }
             });
             return row ;
         });
+        bBack.setOnMouseClicked(event ->
+                {
+                    if(!backlist.empty()){
+                        FilePathTreeItem current= backlist.pop();
+                        System.out.println("Stack Poped -> "+current.getFile());
+                        if(!backlist.empty()) {
+                            current=backlist.pop();
+                            System.out.println("Stack Poped -> "+current.getFile());
+                            addTableItems(current);
+                        }
+                        else
+                        {
+                            System.out.println("Stack Pushed -> "+current.getFile());
+                            backlist.push(currItem);
+                        }
+                    }
+
+                }
+        );
+
+        bUp.setOnMouseClicked(event ->
+                {
+                    FilePathTreeItem item = getSpecificItem(backlist.peek().getFile().getParent());
+                    addTableItems(item);
+                    //backlist.push(item);
+                    // System.out.println("Stack Pushed -> "+item.getFile());
+                }
+        );
+
     }
+
 
     private void addTableItems(FilePathTreeItem item) {
         treeView.getSelectionModel().select(item);
@@ -152,7 +204,7 @@ public class Controller implements Initializable {
         item.getChildren();
         for (FilePathTreeItem fileItem : item.childrenArray)
         {
-            System.out.println("Loading files "+fileItem.getFile().toString());
+            //System.out.println("Loading files "+fileItem.getFile().toString());
             FileDetails fileDetails = new FileDetails(new ImageView(getIcon(fileItem)),fileItem.getFile().getName(),
                     String.valueOf(fileItem.getFile().length()),
                     String.valueOf(sdf.format(fileItem.getFile().lastModified())),fileItem);
@@ -161,12 +213,15 @@ public class Controller implements Initializable {
         }
         tableView.getItems().clear();
         tableView.setItems(imgList);
+        tCurrDir.setText(item.getFile().toString());
+        backlist.push(item);
+        System.out.println("Stack Pushed -> "+item.getFile());
     }
 
     private WritableImage getIcon(FilePathTreeItem fileItem) {
         ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(fileItem.getFile());
         java.awt.Image image = icon.getImage();
-        BufferedImage bufferedImage = (BufferedImage) image;
+        BufferedImage bufferedImage = ImageHelper.toBufferedImage(image);
         return SwingFXUtils.toFXImage(bufferedImage, null);
     }
 
@@ -177,7 +232,7 @@ public class Controller implements Initializable {
         String filename="";
         while (st.hasMoreTokens()) {
             filename+=st.nextToken();
-            System.out.println(filename);
+            //System.out.println(filename);
             if(isDrive)
             {
                 filename+="\\";
@@ -211,13 +266,40 @@ public class Controller implements Initializable {
             }
 
         }
-        tCurrDir.setText(fileItem.getFile().toString());
         return fileItem;
     }
 
 
-//    public void mouseClicked(MouseEvent mouseEvent) {
-//        TreeItem<String> item= (TreeItem<String>) treeView.getSelectionModel().getSelectedItem();
-//
-//    }
+    public void mouseClicked(MouseEvent mouseEvent) {
+        System.out.println(((TreeItem)(treeView.getSelectionModel().getSelectedItem())).getValue());
+        if(((TreeItem)(treeView.getSelectionModel().getSelectedItem()))!=rootNode) {
+            FilePathTreeItem item = (FilePathTreeItem) treeView.getSelectionModel().getSelectedItem();
+            //FilePathTreeItem item = getSpecificItem(item1.);
+            System.out.println(item.getFile());
+            addTableItems(item);
+        }
+        else
+        {
+            System.out.println(rootNode);
+
+            treeView.getSelectionModel().select(rootNode);
+            treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
+
+            ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
+            for (FilePathTreeItem fileItem : drives)
+            {
+                //System.out.println("Loading files "+fileItem.getFile().toString());
+                FileDetails fileDetails = new FileDetails(new ImageView(getIcon(fileItem)),fileItem.getFile().getName(),
+                        String.valueOf(fileItem.getFile().length()),
+                        String.valueOf(sdf.format(fileItem.getFile().lastModified())),fileItem);
+                //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
+                imgList.add(fileDetails);
+            }
+            tableView.getItems().clear();
+            tableView.setItems(imgList);
+            tCurrDir.setText(rootNode.getValue());
+            //backlist.push(rootNode);
+            //System.out.println("Stack Pushed -> "+item.getFile());
+        }
+    }
 }

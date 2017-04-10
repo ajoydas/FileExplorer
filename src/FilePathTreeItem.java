@@ -1,10 +1,13 @@
+import java.awt.event.MouseEvent;
 import java.io.File;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -38,7 +41,7 @@ public class FilePathTreeItem extends TreeItem<String>{
                 @Override
                 public void handle(Event e){
                     FilePathTreeItem source=(FilePathTreeItem)e.getSource();
-                    System.out.println(source.absolutePath);
+                    //System.out.println(source.absolutePath);
                     textField.setText(source.absolutePath);
                     if(!source.isExpanded()){
                         ImageView iv=(ImageView)source.getGraphic();
@@ -50,7 +53,7 @@ public class FilePathTreeItem extends TreeItem<String>{
                 @Override
                 public void handle(Event e){
                     FilePathTreeItem source=(FilePathTreeItem)e.getSource();
-                    System.out.println(source.absolutePath);
+                    //System.out.println(source.absolutePath);
                     textField.setText(source.absolutePath);
                     if(source.isExpanded()){
                         ImageView iv=(ImageView)source.getGraphic();
@@ -78,7 +81,7 @@ public class FilePathTreeItem extends TreeItem<String>{
 
     @Override
     public ObservableList<TreeItem<String>> getChildren(){
-        System.out.println("Getting Children for "+file.toString());
+        //System.out.println("Getting Children for "+file.toString());
         if(isFirstTimeChildren){
             isFirstTimeChildren=false;
             super.getChildren().setAll(buildChildren(this));
@@ -96,7 +99,7 @@ public class FilePathTreeItem extends TreeItem<String>{
     }
 
     private ObservableList<FilePathTreeItem> buildChildren(FilePathTreeItem treeItem){
-        System.out.println("Building Children for "+file.toString());
+        //System.out.println("Building Children for "+file.toString());
         File f=treeItem.getFile();
         if((f!=null)&&(f.isDirectory())){
             File[] files=f.listFiles();
