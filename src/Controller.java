@@ -35,9 +35,9 @@ public class Controller implements Initializable {
     public TableColumn tableSize;
     public TableColumn tableDate;
 
-    TreeItem<String> rootNode;
-    String hostName="computer";
-    ObservableList<FilePathTreeItem> drives;
+    FilePathTreeItem rootNode;
+    public static String hostName="computer";
+    public  static ObservableList<FilePathTreeItem> drives=null;
     Stack<FilePathTreeItem> backlist;
     Image fileImage = new Image(
             getClass().getResourceAsStream("file-icon.png"));
@@ -78,20 +78,16 @@ public class Controller implements Initializable {
         treeView.getSelectionModel().select(nodeItemB2);*/
 
         System.out.println("Working Directory = " +System.getProperty("user.dir"));
-
-
         try{hostName= InetAddress.getLocalHost().getHostName();}catch(UnknownHostException x){
             x.printStackTrace();
         }
         tCurrDir.setText(System.getProperty("user.dir"));
         drives=FXCollections.observableArrayList();
-        rootNode=new TreeItem<>(hostName,new ImageView(new Image(ClassLoader.getSystemResourceAsStream("folder-icon.png"))));
         Iterable<Path> rootDirectories= FileSystems.getDefault().getRootDirectories();
         for(Path name:rootDirectories){
             FilePathTreeItem treeNode=new FilePathTreeItem(name.toFile());
             drives.add(treeNode);
-            rootNode.getChildren().add(treeNode);
-
+            //rootNode.getChildren().add(treeNode);
             /*ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
 
                 System.out.println("Loading files "+treeNode.getFile().toString());
@@ -105,8 +101,11 @@ public class Controller implements Initializable {
             tableView.setItems(imgList);*/
         }
 
+        rootNode=new FilePathTreeItem(hostName);
+
         treeView.setRoot(rootNode);
         FilePathTreeItem currItem=getSpecificItem(System.getProperty("user.dir"));
+        System.out.println("First Item"+ currItem);
         treeView.getSelectionModel().select(currItem);
         addTableItems(currItem);
         //backlist.push(currItem);
@@ -142,8 +141,9 @@ public class Controller implements Initializable {
 
         bGo.setOnMouseClicked(event ->
                 {
-                    FilePathTreeItem item = getSpecificItem(tCurrDir.getText());
-                    addTableItems(item);
+                    String input= tCurrDir.getText();
+                    if(input.equals(hostName))addTableItems(rootNode);
+                     else addTableItems(getSpecificItem(tCurrDir.getText()));
                     //backlist.push(item);
                    // System.out.println("Stack Pushed -> "+item.getFile());
                 }
@@ -168,15 +168,15 @@ public class Controller implements Initializable {
                 {
                     if(!backlist.empty()){
                         FilePathTreeItem current= backlist.pop();
-                        System.out.println("Stack Poped -> "+current.getFile());
+                        System.out.println("Stack Poped -> "+current.getAbsolutePath());
                         if(!backlist.empty()) {
                             current=backlist.pop();
-                            System.out.println("Stack Poped -> "+current.getFile());
+                            System.out.println("Stack Poped -> "+current.getAbsolutePath());
                             addTableItems(current);
                         }
                         else
                         {
-                            System.out.println("Stack Pushed -> "+current.getFile());
+                            System.out.println("Stack Pushed -> "+current.getAbsolutePath());
                             backlist.push(currItem);
                         }
                     }
@@ -186,10 +186,16 @@ public class Controller implements Initializable {
 
         bUp.setOnMouseClicked(event ->
                 {
-                    FilePathTreeItem item = getSpecificItem(backlist.peek().getFile().getParent());
-                    addTableItems(item);
-                    //backlist.push(item);
-                    // System.out.println("Stack Pushed -> "+item.getFile());
+                    if(!backlist.peek().getAbsolutePath().equals(hostName) && backlist.peek().getFile().getParent()==null){
+                        addTableItems(rootNode);
+                    }
+                    else if (!backlist.peek().getAbsolutePath().equals(hostName) && backlist.peek().getFile().getParent()!=null) {
+                        System.out.println(" Parent : " + backlist.peek().getFile().getParent());
+                        FilePathTreeItem item = getSpecificItem(backlist.peek().getFile().getParent());
+                        addTableItems(item);
+                        //backlist.push(item);
+                        // System.out.println("Stack Pushed -> "+item.getFile());
+                    }
                 }
         );
 
@@ -202,20 +208,34 @@ public class Controller implements Initializable {
 
         ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
         item.getChildren();
-        for (FilePathTreeItem fileItem : item.childrenArray)
+        if(!((FilePathTreeItem)treeView.getSelectionModel().getSelectedItem()).getAbsolutePath().equals(hostName)) {
+
+            for (FilePathTreeItem fileItem : item.childrenArray) {
+                //System.out.println("Loading files "+fileItem.getFile().toString());
+                FileDetails fileDetails = new FileDetails(new ImageView(getIcon(fileItem)), fileItem.getFile().getName(),
+                        String.valueOf(fileItem.getFile().length()),
+                        String.valueOf(sdf.format(fileItem.getFile().lastModified())), fileItem);
+                //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
+                imgList.add(fileDetails);
+            }
+        }
+        else
         {
-            //System.out.println("Loading files "+fileItem.getFile().toString());
-            FileDetails fileDetails = new FileDetails(new ImageView(getIcon(fileItem)),fileItem.getFile().getName(),
-                    String.valueOf(fileItem.getFile().length()),
-                    String.valueOf(sdf.format(fileItem.getFile().lastModified())),fileItem);
-        //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
-        imgList.add(fileDetails);
+            for (FilePathTreeItem fileItem : drives)
+            {
+                //System.out.println("Loading files "+fileItem.getFile().toString());
+                FileDetails fileDetails = new FileDetails(new ImageView(getIcon(fileItem)),fileItem.getFile().toString(),
+                        String.valueOf(fileItem.getFile().length()),
+                        String.valueOf(sdf.format(fileItem.getFile().lastModified())),fileItem);
+                //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
+                imgList.add(fileDetails);
+            }
         }
         tableView.getItems().clear();
         tableView.setItems(imgList);
-        tCurrDir.setText(item.getFile().toString());
+        tCurrDir.setText(item.getAbsolutePath());
         backlist.push(item);
-        System.out.println("Stack Pushed -> "+item.getFile());
+        System.out.println("Stack Pushed -> "+item.getAbsolutePath());
     }
 
     private WritableImage getIcon(FilePathTreeItem fileItem) {
@@ -230,9 +250,10 @@ public class Controller implements Initializable {
         StringTokenizer st = new StringTokenizer(currDir,"\\");
         FilePathTreeItem fileItem=null;
         String filename="";
+        rootNode.setExpanded(true);
         while (st.hasMoreTokens()) {
             filename+=st.nextToken();
-            //System.out.println(filename);
+            System.out.println(filename);
             if(isDrive)
             {
                 filename+="\\";
@@ -250,11 +271,12 @@ public class Controller implements Initializable {
             }
             else
             {
-                //fileItem.getChildren();
+                //System.out.println("In Else Item ");
+                fileItem.getChildren();
                 fileItem.setExpanded(true);
                 for (FilePathTreeItem item:fileItem.childrenArray)
                 {
-                    //System.out.println(item.getFile().toString());
+                    //System.out.println("In for loop "+item.getFile().toString());
                     if(item.getFile().toString().equals(filename))
                     {
                         fileItem=item;
@@ -266,13 +288,17 @@ public class Controller implements Initializable {
             }
 
         }
+        System.out.println("Returned Item "+fileItem);
         return fileItem;
     }
 
 
     public void mouseClicked(MouseEvent mouseEvent) {
-        System.out.println(((TreeItem)(treeView.getSelectionModel().getSelectedItem())).getValue());
-        if(((TreeItem)(treeView.getSelectionModel().getSelectedItem()))!=rootNode) {
+        //System.out.println(((TreeItem)(treeView.getSelectionModel().getSelectedItem())).getValue());
+        FilePathTreeItem item = (FilePathTreeItem) treeView.getSelectionModel().getSelectedItem();
+        System.out.println(item.getAbsolutePath());
+        addTableItems(item);
+        /*if(!((FilePathTreeItem)treeView.getSelectionModel().getSelectedItem()).getAbsolutePath().equals(hostName)) {
             FilePathTreeItem item = (FilePathTreeItem) treeView.getSelectionModel().getSelectedItem();
             //FilePathTreeItem item = getSpecificItem(item1.);
             System.out.println(item.getFile());
@@ -289,7 +315,7 @@ public class Controller implements Initializable {
             for (FilePathTreeItem fileItem : drives)
             {
                 //System.out.println("Loading files "+fileItem.getFile().toString());
-                FileDetails fileDetails = new FileDetails(new ImageView(getIcon(fileItem)),fileItem.getFile().getName(),
+                FileDetails fileDetails = new FileDetails(new ImageView(getIcon(fileItem)),fileItem.getFile().toString(),
                         String.valueOf(fileItem.getFile().length()),
                         String.valueOf(sdf.format(fileItem.getFile().lastModified())),fileItem);
                 //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
@@ -297,9 +323,9 @@ public class Controller implements Initializable {
             }
             tableView.getItems().clear();
             tableView.setItems(imgList);
-            tCurrDir.setText(rootNode.getValue());
-            //backlist.push(rootNode);
-            //System.out.println("Stack Pushed -> "+item.getFile());
-        }
+            tCurrDir.setText(rootNode.getAbsolutePath());
+            backlist.push(rootNode);
+            System.out.println("Stack Pushed -> "+rootNode.getAbsolutePath());
+        }*/
     }
 }

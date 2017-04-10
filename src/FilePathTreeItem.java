@@ -28,7 +28,12 @@ public class FilePathTreeItem extends TreeItem<String>{
     public String getAbsolutePath(){return(this.absolutePath);}
     private final boolean isDirectory;
     public boolean isDirectory(){return(this.isDirectory);}
-
+    public FilePathTreeItem(String hostname){
+        super(hostname);
+        this.absolutePath=hostname;
+        this.file=null;
+        this.isDirectory=true;
+    }
     public FilePathTreeItem(File file){
         super(file.toString());
         this.file=file;
@@ -93,19 +98,26 @@ public class FilePathTreeItem extends TreeItem<String>{
     public boolean isLeaf(){
         if(isFirstTimeLeaf){
             isFirstTimeLeaf=false;
-            isLeaf=this.file.isFile();
+            if(!this.absolutePath.equals(Controller.hostName)) isLeaf=this.file.isFile();
+            else isLeaf=false;
         }
         return(isLeaf);
     }
 
     private ObservableList<FilePathTreeItem> buildChildren(FilePathTreeItem treeItem){
-        //System.out.println("Building Children for "+file.toString());
+        System.out.println("Building Children for abs "+absolutePath+" host "+Controller.hostName);
+        childrenArray=FXCollections.observableArrayList();
+        if(this.absolutePath.equals(Controller.hostName))
+        {
+            childrenArray=Controller.drives;
+            return Controller.drives;
+        }
         File f=treeItem.getFile();
         if((f!=null)&&(f.isDirectory())){
             File[] files=f.listFiles();
             if (files!=null){
                 ObservableList<FilePathTreeItem> children=FXCollections.observableArrayList();
-                childrenArray=FXCollections.observableArrayList();
+
                 for(File childFile:files){
                     FilePathTreeItem item= new FilePathTreeItem(childFile);
                     children.add(item);
