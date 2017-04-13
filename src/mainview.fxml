@@ -25,8 +25,8 @@
                  <menus>
                      <Menu mnemonicParsing="false" text="Option">
                         <items>
-                            <MenuItem mnemonicParsing="false" text="Details" />
-                            <MenuItem mnemonicParsing="false" text="Tiles" />
+                            <MenuItem fx:id="menuDetails" mnemonicParsing="false" text="Details" />
+                            <MenuItem fx:id="menuTiles" mnemonicParsing="false" text="Tiles" />
                         </items>
                      </Menu>
                  </menus>

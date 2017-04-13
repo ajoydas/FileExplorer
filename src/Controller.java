@@ -17,6 +17,7 @@ import javafx.scene.layout.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -43,30 +44,49 @@ public class Controller implements Initializable {
     public GridPane gridPane;
     public ScrollPane scroll1;
     public ScrollPane scroll2;
+    public MenuItem menuDetails;
+    public MenuItem menuTiles;
 
     FilePathTreeItem rootNode;
     public static String hostName="computer";
     public  static ObservableList<FilePathTreeItem> drives=null;
     public static VBoxItem[] vBox;
-    Stack<FilePathTreeItem> backlist;
+    public  static  Stack<FilePathTreeItem> backlist;
     Image fileImage = new Image(
-            getClass().getResourceAsStream("file-icon.png"));
+            getClass().getResourceAsStream("/file-icon.png"));
     Image folderImage = new Image(
-            getClass().getResourceAsStream("folder-icon.png"));
+            getClass().getResourceAsStream("/folder-icon.png"));
     Image fileTile = new Image(
-            getClass().getResourceAsStream("file-tile.png"));
+            getClass().getResourceAsStream("/file-tile.png"));
     Image folderTile = new Image(
-            getClass().getResourceAsStream("folder-tile.png"));
-    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+            getClass().getResourceAsStream("/folder-tile.png"));
+    public  static  SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        tableView.setVisible(false);
-        //flowPane.setVisible(false);
+        menuDetails.setOnAction(e->
+        {
+            tableView.setVisible(true);
+            flowPane.setVisible(false);
+            scroll1.setVisible(false);
+        });
+        menuTiles.setOnAction(e->
+        {
+            tableView.setVisible(false);
+            flowPane.setVisible(true);
+            scroll1.setVisible(true);
+        });
+
+        flowPane.setVisible(false);
+        scroll1.setVisible(false);
         gridPane.setVisible(false);
-        //scroll1.setVisible(false);
         scroll2.setVisible(false);
+
+        VBoxItem.treeView=treeView;
+        VBoxItem.tCurrDir=tCurrDir;
+        VBoxItem.flowPane=flowPane;
+        VBoxItem.tableView=tableView;
         /*VBox vBox1 = new VBox(10);
         vBox1.setAlignment(Pos.CENTER);
         vBox1.getChildren().addAll(new ImageView(folderTile), new Label("File1"));
@@ -104,7 +124,7 @@ public class Controller implements Initializable {
             });
         }*/
 
-        int i=0;
+       /* int i=0;
         for ( i = 0; i < 5; i++) {
             ColumnConstraints column = new ColumnConstraints(100);
             RowConstraints row = new RowConstraints(100);
@@ -114,65 +134,11 @@ public class Controller implements Initializable {
         vBox=new VBoxItem[4];
         for (i=0;i<4;i++) {
             vBox[i]=new VBoxItem(new ImageView(folderTile),new Label("File "+i));
-            /*GridPane.setConstraints(vBox[i], i, 0);
-            gridPane.getChildren().add(vBox[i]);*/
+            //GridPane.setConstraints(vBox[i], i, 0);
+            //gridPane.getChildren().add(vBox[i]);
             flowPane.getChildren().add(vBox[i]);
         }
-
-
-
-
-
-
-        ObservableList<ImageView> images = FXCollections.observableArrayList();
-        images.addAll(new ImageView(fileImage),new ImageView(folderImage));
-//        flowPane.getChildren().add(vBox1);
-//        flowPane.getChildren().add(vBox2);
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File2")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File3")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File4")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File4")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File5")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File6")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File7")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-        flowPane.getChildren().add(new VBox(new ImageView(folderTile), new Label("File1")));
-
-
-
-
-
-
-
-
-
+        */
         FilePathTreeItem.textField=tCurrDir;
         backlist=new Stack<>();
         /*TreeItem<String> treeItemRoot = new TreeItem<> ("Root");
@@ -234,6 +200,7 @@ public class Controller implements Initializable {
         System.out.println("First Item"+ currItem);
         treeView.getSelectionModel().select(currItem);
         addTableItems(currItem);
+        addTileItems(currItem);
         //backlist.push(currItem);
         //System.out.println("Stack Pushed -> "+currItem.getFile());
         treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
@@ -268,8 +235,15 @@ public class Controller implements Initializable {
         bGo.setOnMouseClicked(event ->
                 {
                     String input= tCurrDir.getText();
-                    if(input.equals(hostName))addTableItems(rootNode);
-                     else addTableItems(getSpecificItem(tCurrDir.getText()));
+                    if(input.equals(hostName))
+                    {
+                        addTableItems(rootNode); addTileItems(rootNode);
+                    }
+                     else
+                    {
+                        addTableItems(getSpecificItem(tCurrDir.getText()));
+                        addTileItems(getSpecificItem(tCurrDir.getText()));
+                    }
                     //backlist.push(item);
                    // System.out.println("Stack Pushed -> "+item.getFile());
                 }
@@ -283,6 +257,7 @@ public class Controller implements Initializable {
                     if(rowData.getItem().isDirectory())
                     {
                         addTableItems(rowData.getItem());
+                        addTileItems(rowData.getItem());
                         //backlist.push(rowData.getItem());
                         //System.out.println("Stack Pushed -> "+rowData.getItem().getFile());
                     }
@@ -299,6 +274,7 @@ public class Controller implements Initializable {
                             current=backlist.pop();
                             System.out.println("Stack Poped -> "+current.getAbsolutePath());
                             addTableItems(current);
+                            addTileItems(current);
                         }
                         else
                         {
@@ -314,17 +290,54 @@ public class Controller implements Initializable {
                 {
                     if(!backlist.peek().getAbsolutePath().equals(hostName) && backlist.peek().getFile().getParent()==null){
                         addTableItems(rootNode);
+                        addTileItems(rootNode);
                     }
                     else if (!backlist.peek().getAbsolutePath().equals(hostName) && backlist.peek().getFile().getParent()!=null) {
                         System.out.println(" Parent : " + backlist.peek().getFile().getParent());
                         FilePathTreeItem item = getSpecificItem(backlist.peek().getFile().getParent());
                         addTableItems(item);
+                        addTileItems(item);
                         //backlist.push(item);
                         // System.out.println("Stack Pushed -> "+item.getFile());
                     }
                 }
         );
 
+    }
+
+    private void addTileItems(FilePathTreeItem item) {
+        treeView.getSelectionModel().select(item);
+        treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
+
+        vBox=new VBoxItem[item.getChildren().size()];
+        ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
+        item.getChildren();
+        int i=0;
+        if(!((FilePathTreeItem)treeView.getSelectionModel().getSelectedItem()).getAbsolutePath().equals(hostName)) {
+
+            for (FilePathTreeItem fileItem : item.childrenArray) {
+
+                try {
+                    vBox[i++]=new VBoxItem(new ImageView(getIconBig(fileItem)),new Label(fileItem.getFile().getName()),fileItem);
+                } catch (Exception e) {
+                    i--;
+                    vBox[i++]=new VBoxItem(new ImageView(getIcon(fileItem)),new Label(fileItem.getFile().getName()),fileItem);
+                    e.printStackTrace();
+                }
+            }
+        }
+        else
+        {
+            for (FilePathTreeItem fileItem : drives)
+            {
+                vBox[i++]=new VBoxItem(new ImageView(getIcon(fileItem)),new Label(fileItem.getAbsolutePath()),fileItem);
+            }
+        }
+        flowPane.getChildren().clear();
+        flowPane.getChildren().addAll(vBox);
+        tCurrDir.setText(item.getAbsolutePath());
+        //backlist.push(item);
+        System.out.println("Stack Pushed -> "+item.getAbsolutePath());
     }
 
 
@@ -364,8 +377,20 @@ public class Controller implements Initializable {
         System.out.println("Stack Pushed -> "+item.getAbsolutePath());
     }
 
-    private WritableImage getIcon(FilePathTreeItem fileItem) {
+    public static WritableImage getIcon(FilePathTreeItem fileItem) {
         ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(fileItem.getFile());
+        java.awt.Image image = icon.getImage();
+        BufferedImage bufferedImage = ImageHelper.toBufferedImage(image);
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+    public static WritableImage getIconBig(FilePathTreeItem fileItem) {
+        ImageIcon icon=null;
+        try {
+            icon = new ImageIcon(sun.awt.shell.ShellFolder.getShellFolder( fileItem.getFile() ).getIcon( true ) );
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         java.awt.Image image = icon.getImage();
         BufferedImage bufferedImage = ImageHelper.toBufferedImage(image);
         return SwingFXUtils.toFXImage(bufferedImage, null);
@@ -424,6 +449,7 @@ public class Controller implements Initializable {
         FilePathTreeItem item = (FilePathTreeItem) treeView.getSelectionModel().getSelectedItem();
         System.out.println(item.getAbsolutePath());
         addTableItems(item);
+        addTileItems(item);
         /*if(!((FilePathTreeItem)treeView.getSelectionModel().getSelectedItem()).getAbsolutePath().equals(hostName)) {
             FilePathTreeItem item = (FilePathTreeItem) treeView.getSelectionModel().getSelectedItem();
             //FilePathTreeItem item = getSpecificItem(item1.);
