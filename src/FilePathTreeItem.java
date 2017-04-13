@@ -105,7 +105,7 @@ public class FilePathTreeItem extends TreeItem<String>{
     }
 
     private ObservableList<FilePathTreeItem> buildChildren(FilePathTreeItem treeItem){
-        System.out.println("Building Children for abs "+absolutePath+" host "+Controller.hostName);
+        //System.out.println("Building Children for abs "+absolutePath+" host "+Controller.hostName);
         childrenArray=FXCollections.observableArrayList();
         if(this.absolutePath.equals(Controller.hostName))
         {

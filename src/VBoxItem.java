@@ -1,6 +1,8 @@
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -30,13 +32,18 @@ public class VBoxItem extends VBox {
     VBoxItem(ImageView imageView,Label label,FilePathTreeItem item)
     {
         super(imageView,label);
+        this.setAlignment(Pos.CENTER);
+        this.setSpacing(5);
+        this.setPadding(new Insets(20));
+        this.setWidth(100);
+        //this.setFillWidth(true);
         this.label=label;
         this.item=item;
         this.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 
             @Override
             public void handle(MouseEvent event) {
-                if (event.getClickCount()==1) {
+                if (event.getClickCount()==1 && MenuSetting.getInstance().view.equals("tiles")) {
                     System.out.println(label.getText()+" Clicked single");
                     VBoxItem vBoxItem = (VBoxItem) event.getSource();
                     for (int i = 0; i < Controller.vBox.length; i++) {
@@ -48,7 +55,7 @@ public class VBoxItem extends VBox {
                     label.setTextFill(Color.web("#ffffff"));
                     event.consume();
                 }
-                else
+                else if(event.getClickCount()!=1 && MenuSetting.getInstance().view.equals("tiles"))
                 {
                     System.out.println(s+" Clicked double");
                     treeView.getSelectionModel().select(item);
@@ -61,7 +68,9 @@ public class VBoxItem extends VBox {
 
                         for (FilePathTreeItem fileItem : item.childrenArray) {
 
-                            Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIconBig(fileItem)),new Label(fileItem.getFile().getName()),fileItem);
+                            Label label= new Label(fileItem.getFile().getName());
+                            label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
+                            Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIconBig(fileItem)),label,fileItem);
 
                         }
                     }
@@ -69,11 +78,13 @@ public class VBoxItem extends VBox {
                     {
                         for (FilePathTreeItem fileItem : Controller.drives)
                         {
+                            Label label= new Label(fileItem.getAbsolutePath());
+                            label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
                             try {
-                                Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIconBig(fileItem)),new Label(fileItem.getAbsolutePath()),fileItem);
+                                Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIconBig(fileItem)),label,fileItem);
                             } catch (Exception e) {
                                 i--;
-                                Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIcon(fileItem)),new Label(fileItem.getAbsolutePath()),fileItem);
+                                Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIcon(fileItem)),label,fileItem);
                                 e.printStackTrace();
                             }
                         }
@@ -81,12 +92,13 @@ public class VBoxItem extends VBox {
                     flowPane.getChildren().clear();
                     flowPane.getChildren().addAll(Controller.vBox);
                     tCurrDir.setText(item.getAbsolutePath());
-                    //Controller.backlist.push(item);
+                    Controller.backlist.push(item);
+                    MenuSetting.getInstance().currItem=item;
                     System.out.println("Stack Pushed -> "+item.getAbsolutePath());
 
 
                     //Table
-                    treeView.getSelectionModel().select(item);
+                    /*treeView.getSelectionModel().select(item);
                     treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
 
                     ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
@@ -119,7 +131,7 @@ public class VBoxItem extends VBox {
                     tCurrDir.setText(item.getAbsolutePath());
                     Controller.backlist.push(item);
                     System.out.println("Stack Pushed -> "+item.getAbsolutePath());
-
+*/
                 }
             }
         });
