@@ -13,11 +13,9 @@ import javafx.scene.image.ImageView;
 
 public class FilePathTreeItem extends TreeItem<String>{
     public static TextField textField=null;
-    public static  ObservableList<FilePathTreeItem> allFolders=FXCollections.observableArrayList();
     public  ObservableList<FilePathTreeItem> childrenArray=FXCollections.observableArrayList();
 
-    public static Image folderCollapseImage=new Image(ClassLoader.getSystemResourceAsStream("folder-icon.png"));
-    public static Image folderExpandImage=new Image(ClassLoader.getSystemResourceAsStream("folder-icon.png"));
+    public static Image folderImage=new Image(ClassLoader.getSystemResourceAsStream("folder-icon.png"));
     public static Image fileImage=new Image(ClassLoader.getSystemResourceAsStream("file-icon.png"));
     private boolean isLeaf;
     private boolean isFirstTimeChildren=true;
@@ -40,9 +38,9 @@ public class FilePathTreeItem extends TreeItem<String>{
         this.absolutePath=file.getAbsolutePath();
         this.isDirectory=file.isDirectory();
         if(this.isDirectory){
-            this.setGraphic(new ImageView(folderCollapseImage));
+            this.setGraphic(new ImageView(folderImage));
             //add event handlers
-            this.addEventHandler(TreeItem.branchCollapsedEvent(),new EventHandler(){
+            /*this.addEventHandler(TreeItem.branchCollapsedEvent(),new EventHandler(){
                 @Override
                 public void handle(Event e){
                     FilePathTreeItem source=(FilePathTreeItem)e.getSource();
@@ -66,8 +64,7 @@ public class FilePathTreeItem extends TreeItem<String>{
                     }
                 }
             } );
-
-
+*/
         }else{
             this.setGraphic(new ImageView(fileImage));
         }
@@ -129,5 +126,4 @@ public class FilePathTreeItem extends TreeItem<String>{
         }
         return FXCollections.emptyObservableList();
     }
-
 }

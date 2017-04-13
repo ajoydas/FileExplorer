@@ -25,42 +25,44 @@ public class VBoxItem extends VBox {
     public FilePathTreeItem item;
     String s;
     Label label;
+    int pos;
     public static TreeView treeView=null;
     public static TextField tCurrDir=null;
     public static FlowPane flowPane=null;
     public static TableView tableView=null;
-    VBoxItem(ImageView imageView,Label label,FilePathTreeItem item)
+    public static int lastClicked=-1;
+    VBoxItem(int pos,ImageView imageView,Label label,FilePathTreeItem item)
     {
         super(imageView,label);
-        this.setAlignment(Pos.CENTER);
-        this.setSpacing(5);
-        this.setPadding(new Insets(20));
-        this.setWidth(100);
-        //this.setFillWidth(true);
+        setLayout();
+        this.pos=pos;
         this.label=label;
         this.item=item;
         this.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-
             @Override
             public void handle(MouseEvent event) {
                 if (event.getClickCount()==1 && MenuSetting.getInstance().view.equals("tiles")) {
                     System.out.println(label.getText()+" Clicked single");
                     VBoxItem vBoxItem = (VBoxItem) event.getSource();
-                    for (int i = 0; i < Controller.vBox.length; i++) {
+                    /*for (int i = 0; i < Controller.vBox.length; i++) {
                         Controller.vBox[i].setStyle("-fx-background-color: inherit;");
                         Controller.vBox[i].label.setTextFill(Color.web("#000000"));
+                    }*/
+                    if(lastClicked!=-1) {
+                        Controller.vBox[lastClicked].setStyle("-fx-background-color: inherit;");
+                        Controller.vBox[lastClicked].label.setTextFill(Color.web("#000000"));
                     }
-
+                    lastClicked=pos;
                     vBoxItem.setStyle("-fx-background-color: #2679a5;");
                     label.setTextFill(Color.web("#ffffff"));
-                    event.consume();
+
                 }
                 else if(event.getClickCount()!=1 && MenuSetting.getInstance().view.equals("tiles"))
                 {
                     System.out.println(s+" Clicked double");
+                    if(!item.isDirectory())return;
                     treeView.getSelectionModel().select(item);
                     treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
-
                     Controller.vBox=new VBoxItem[item.getChildren().size()];
                     item.getChildren();
                     int i=0;
@@ -70,8 +72,15 @@ public class VBoxItem extends VBox {
 
                             Label label= new Label(fileItem.getFile().getName());
                             label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
-                            Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIconBig(fileItem)),label,fileItem);
-
+                            try {
+                                Controller.vBox[i] = new VBoxItem(i, new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.BIG_ICON)), label, fileItem);
+                                i++;
+                            }
+                            catch (Exception e)
+                            {
+                                Controller.vBox[i] = new VBoxItem(i, new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)), label, fileItem);
+                                i++;
+                            }
                         }
                     }
                     else
@@ -80,15 +89,12 @@ public class VBoxItem extends VBox {
                         {
                             Label label= new Label(fileItem.getAbsolutePath());
                             label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
-                            try {
-                                Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIconBig(fileItem)),label,fileItem);
-                            } catch (Exception e) {
-                                i--;
-                                Controller.vBox[i++]=new VBoxItem(new ImageView(Controller.getIcon(fileItem)),label,fileItem);
-                                e.printStackTrace();
-                            }
+                            Controller.vBox[i]=new VBoxItem(i,new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)),label,fileItem);
+                            i++;
+
                         }
                     }
+                    lastClicked=-1;
                     flowPane.getChildren().clear();
                     flowPane.getChildren().addAll(Controller.vBox);
                     tCurrDir.setText(item.getAbsolutePath());
@@ -133,7 +139,15 @@ public class VBoxItem extends VBox {
                     System.out.println("Stack Pushed -> "+item.getAbsolutePath());
 */
                 }
+                event.consume();
             }
         });
+    }
+
+    private void setLayout() {
+        this.setAlignment(Pos.CENTER);
+        this.setSpacing(5);
+        this.setPadding(new Insets(20));
+        this.setWidth(100);
     }
 }

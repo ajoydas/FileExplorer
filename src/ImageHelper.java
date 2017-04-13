@@ -1,11 +1,45 @@
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.WritableImage;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 
 /**
  * Created by hp on 10-04-2017.
  */
 public class ImageHelper {
-    public static BufferedImage toBufferedImage(Image img)
+
+    public static final int SMALL_ICON=0;
+    public static final int BIG_ICON=1;
+
+    public static WritableImage getIcon(FilePathTreeItem fileItem,int size) {
+        if (size==SMALL_ICON)return getSmallIcon(fileItem);
+        else if(size==BIG_ICON) return getBigIcon(fileItem);
+        return null;
+    }
+
+    private static WritableImage getSmallIcon(FilePathTreeItem fileItem) {
+        ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(fileItem.getFile());
+        java.awt.Image image = icon.getImage();
+        BufferedImage bufferedImage = ImageHelper.toBufferedImage(image);
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+    private static WritableImage getBigIcon(FilePathTreeItem fileItem) {
+        ImageIcon icon=null;
+        try {
+            icon = new ImageIcon(sun.awt.shell.ShellFolder.getShellFolder( fileItem.getFile() ).getIcon( true ) );
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        java.awt.Image image = icon.getImage();
+        BufferedImage bufferedImage = ImageHelper.toBufferedImage(image);
+        return SwingFXUtils.toFXImage(bufferedImage, null);
+    }
+    private static BufferedImage toBufferedImage(Image img)
     {
         if (img instanceof BufferedImage)
         {
