@@ -12,13 +12,14 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by hp on 11-04-2017.
  */
 public class VBoxItem extends VBox {
-    public File file;
     public FileTreeItem item;
     String s;
     Label label;
@@ -38,9 +39,10 @@ public class VBoxItem extends VBox {
         this.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                VBoxItem vBoxItem = (VBoxItem) event.getSource();
                 if (event.getClickCount()==1 && MenuSetting.getInstance().view.equals("tiles")) {
                     System.out.println(label.getText()+" Clicked single");
-                    VBoxItem vBoxItem = (VBoxItem) event.getSource();
+
 
                     if(lastClicked!=-1) {
                         Controller.vBox[lastClicked].setStyle("-fx-background-color: inherit;");
@@ -53,8 +55,27 @@ public class VBoxItem extends VBox {
                 }
                 else if(event.getClickCount()!=1 && MenuSetting.getInstance().view.equals("tiles"))
                 {
-                    System.out.println(s+" Clicked double");
-                    if(!item.isDirectory())return;
+                    System.out.println("Clicked double");
+                    if(!item.isDirectory())
+                    {
+                        /*try {
+                            Desktop.getDesktop().open(vBoxItem.item.getFile());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }*/
+
+                        if( Desktop.isDesktopSupported() )
+                        {
+                            new Thread(() -> {
+                                try {
+                                    Desktop.getDesktop().open(vBoxItem.item.getFile());
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }).start();
+                        }
+                        return;
+                    }
                     treeView.getSelectionModel().select(item);
                     treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
                     Controller.vBox=new VBoxItem[item.getChildren().size()];

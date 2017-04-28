@@ -3,15 +3,22 @@ import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -66,16 +73,29 @@ public class Controller implements Initializable {
             x.printStackTrace();
         }
         tCurrDir.setText(System.getProperty("user.dir"));
-        drives=FXCollections.observableArrayList();
-        Iterable<Path> rootDirectories= FileSystems.getDefault().getRootDirectories();
-        for(Path name:rootDirectories){
-            FileTreeItem treeNode=new FileTreeItem(name.toFile());
+        drives = FXCollections.observableArrayList();
+        /*if(System.getProperty("os.name").toLowerCase().contains("windows")) {
+
+            Iterable<Path> rootDirectories = FileSystems.getDefault().getRootDirectories();
+            for (Path name : rootDirectories) {
+                FileTreeItem treeNode = new FileTreeItem(name.toFile());
+                drives.add(treeNode);
+            }
+        }*/
+
+        File[] f = File.listRoots();
+        for (int i = 0; i < f.length; i++)
+        {
+            FileTreeItem treeNode = new FileTreeItem(f[i]);
             drives.add(treeNode);
         }
+
 
         rootNode=new FileTreeItem(hostName);
         treeView.setRoot(rootNode);
         FileTreeItem currItem= getItemFromAddress(System.getProperty("user.dir"));
+        //FileTreeItem currItem= getItemFromAddress("/home");
+
         treeView.getSelectionModel().select(currItem);
         showItems(currItem);
 
@@ -135,6 +155,29 @@ public class Controller implements Initializable {
                     {
                         showItems(rowData.getItem());
                         //addTileItems(rowData.getItem());
+                    }
+                    else
+                    {
+                        /*try {
+                            Desktop.getDesktop().open(rowData.getItem().getFile());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }*/
+                        try {
+                            if( Desktop.isDesktopSupported() )
+                            {
+                                new Thread(() -> {
+                                    try {
+                                        Desktop.getDesktop().open(rowData.getItem().getFile());
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }).start();
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -236,6 +279,63 @@ public class Controller implements Initializable {
 
     private FileTreeItem getItemFromAddress(String currDir) {
         boolean isDrive=true;
+        StringTokenizer st = new StringTokenizer(currDir,"/");
+        if(System.getProperty("os.name").toLowerCase().contains("windows"))st = new StringTokenizer(currDir,"\\");
+        FileTreeItem fileItem=null;
+        String filename="";
+        rootNode.setExpanded(true);
+        if(!System.getProperty("os.name").toLowerCase().contains("windows"))
+        {
+            filename="/";
+            for (FileTreeItem item: drives)
+            {
+                //System.out.println(item.getFile().toString());
+                if(item.getFile().toString().equals(filename))
+                {
+                    fileItem=item;
+                    break;
+                }
+            }
+        }
+        while (st.hasMoreTokens()) {
+            filename+=st.nextToken();
+            System.out.println(filename);
+            if(isDrive && System.getProperty("os.name").toLowerCase().contains("windows")) {
+                filename+="\\";
+                isDrive=false;
+                //ObservableList<FileTreeItem> children= rootNode.getChildren();
+                for (FileTreeItem item: drives)
+                {
+                    //System.out.println(item.getFile().toString());
+                    if(item.getFile().toString().equals(filename))
+                    {
+                        fileItem=item;
+                        break;
+                    }
+                }
+            }
+            else {
+                //System.out.println("In Else Item ");
+                fileItem.getChildren();
+                fileItem.setExpanded(true);
+                for (FileTreeItem item:fileItem.childrenArray)
+                {
+                    //System.out.println("In for loop "+item.getFile().toString());
+                    if(item.getFile().toString().equals(filename))
+                    {
+                        fileItem=item;
+                        break;
+                    }
+                }
+                if(System.getProperty("os.name").toLowerCase().contains("windows"))filename+="\\";
+                else filename+="/";
+            }
+        }
+        //System.out.println("Returned Item "+fileItem);
+        return fileItem;
+    }
+    /*private FileTreeItem getItemFromAddress(String currDir) {
+        boolean isDrive=true;
         StringTokenizer st = new StringTokenizer(currDir,"\\");
         FileTreeItem fileItem=null;
         String filename="";
@@ -275,8 +375,7 @@ public class Controller implements Initializable {
         }
         //System.out.println("Returned Item "+fileItem);
         return fileItem;
-    }
-
+    }*/
 
     public void treeViewMouseClicked(MouseEvent mouseEvent) {
         //System.out.println(((TreeItem)(treeView.getSelectionModel().getSelectedItem())).getValue());
