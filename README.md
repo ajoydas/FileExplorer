@@ -4,13 +4,6 @@ This provide a graphical user interface that can show all the files in any direc
 It support two different style of viewing the files.
 In Windows os it is able to run from any folder and show the files of that folder. While in Linux it starts from user's home directory.
 
-User Interface:
-
-![Alt text](/Demo_images/mainview.JPG?raw=true "Main View")
-![Alt text](/Demo_images/mainviewTiles.JPG?raw=true "Main Tiles View")
-![Alt text](/Demo_images/view2.JPG?raw=true "Another Details View")
-![Alt text](/Demo_images/view2tiles.JPG?raw=true "Another Tiles View")
-
 # Documentation:
 Part 1: Classes:
 
@@ -38,7 +31,7 @@ An extened treeItem that contains File information. It implements lazy loading, 
 
 ChildArrayHelper :
 It returns the children array of the special rootnode or general filetreenode depending on the input. Works as a factory class.
--getChildren
+- getChildren
 
 MenuSetting:
 It saves the current view (details/tiles) that is showing and the current filetreeitem that has been populated on the view. Works as a singleton setting class.
@@ -63,29 +56,38 @@ Generates the small or big sized image depending on the input. Works as a factor
 
 Part 2:
 Singleton Pattern:
--MenuSetting
--java.lang.System
--javafx.application.Application
+- MenuSetting
+- java.lang.System
+- javafx.application.Application
 
 Factory Pattern:
--ChildArrayHelper
--ImageHelper
--java.text.SimpleDateFormat
--javafx.scene.paint.Color
+- ChildArrayHelper
+- ImageHelper
+- java.text.SimpleDateFormat
+- javafx.scene.paint.Color
 
 Adapter Pattern:
--FilePathTreeItem
--VBoxItem
--javafx.collections.ObservableList
+- FilePathTreeItem
+- VBoxItem
+- javafx.collections.ObservableList
 
 Composite Pattern:
--FilePathTreeItem
--java.io.File
--javafx.scene.control.TreeItem
--javafx.scene.layout.Pane
--javafx.scene.layout.AnchorPane
--javafx.scene.layout.FlowPane
--javafx.scene.layout.VBox
+- FilePathTreeItem
+- java.io.File
+- javafx.scene.control.TreeItem
+- javafx.scene.layout.Pane
+- javafx.scene.layout.AnchorPane
+- javafx.scene.layout.FlowPane
+- javafx.scene.layout.VBox
 
 
 
+User Interface:
+
+![Alt text](/Demo_images/mainview.JPG?raw=true "Main View")
+
+![Alt text](/Demo_images/mainviewTiles.JPG?raw=true "Main Tiles View")
+
+![Alt text](/Demo_images/view2.JPG?raw=true "Another Details View")
+
+![Alt text](/Demo_images/view2tiles.JPG?raw=true "Another Tiles View")
