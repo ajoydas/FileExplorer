@@ -1,11 +1,14 @@
 # FileExplorer
 App type: JavaFx
+
 This provide a graphical user interface that can show all the files in any directory.
 It support two different style of viewing the files.
 In Windows os it is able to run from any folder and show the files of that folder. While in Linux it starts from user's home directory.
 
+It opens the file with the default application.
+
 # Documentation:
-Part 1: Classes:
+**Part 1: Classes:**
 
 Main [extends Application] :
 Starts the JavaFx application and sets the layout.
@@ -54,7 +57,9 @@ Generates the small or big sized image depending on the input. Works as a factor
 - toBufferedImage
 
 
-Part 2:
+
+**Part 2:**
+
 Singleton Pattern:
 - MenuSetting
 - java.lang.System
