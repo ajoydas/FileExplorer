@@ -1,4 +1,3 @@
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -7,10 +6,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -66,34 +63,24 @@ public class VBoxItem extends VBox {
                     Controller.vBox=new VBoxItem[item.getChildren().size()];
                     item.getChildren();
                     int i=0;
-                    if(!((FilePathTreeItem)treeView.getSelectionModel().getSelectedItem()).getAbsolutePath().equals(Controller.hostName)) {
+                    ObservableList<FilePathTreeItem> list = ChildArrayHelper.getChildren(item);
+                    Label label;
+                    for (FilePathTreeItem fileItem : item.childrenArray) {
 
-                        for (FilePathTreeItem fileItem : item.childrenArray) {
-
-                            Label label= new Label(fileItem.getFile().getName());
-                            label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
-                            try {
-                                Controller.vBox[i] = new VBoxItem(i, new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.BIG_ICON)), label, fileItem);
-                                i++;
-                            }
-                            catch (Exception e)
-                            {
-                                Controller.vBox[i] = new VBoxItem(i, new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)), label, fileItem);
-                                i++;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (FilePathTreeItem fileItem : Controller.drives)
-                        {
-                            Label label= new Label(fileItem.getAbsolutePath());
-                            label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
-                            Controller.vBox[i]=new VBoxItem(i,new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)),label,fileItem);
+                        if(list==Controller.drives)label= new Label(fileItem.getAbsolutePath());
+                        else label= new Label(fileItem.getFile().getName());
+                        label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
+                        try {
+                            Controller.vBox[i] = new VBoxItem(i, new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.BIG_ICON)), label, fileItem);
                             i++;
-
+                        }
+                        catch (Exception e)
+                        {
+                            Controller.vBox[i] = new VBoxItem(i, new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)), label, fileItem);
+                            i++;
                         }
                     }
+
                     lastClicked=-1;
                     flowPane.getChildren().clear();
                     flowPane.getChildren().addAll(Controller.vBox);

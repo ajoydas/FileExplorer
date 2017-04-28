@@ -4,7 +4,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
@@ -35,24 +34,16 @@ public class Controller implements Initializable {
     public MenuItem menuDetails;
     public MenuItem menuTiles;
 
-    public TableColumn tableIcon;
-    public TableColumn tableName;
-    public TableColumn tableSize;
-    public TableColumn tableDate;
+    private TableColumn tableIcon;
+    private TableColumn tableName;
+    private TableColumn tableSize;
+    private TableColumn tableDate;
     private FilePathTreeItem rootNode;
     public static String hostName="computer";
     public  static ObservableList<FilePathTreeItem> drives=null;
     public static VBoxItem[] vBox;
     public  static  Stack<FilePathTreeItem> backlist;
-    Image fileImage = new Image(
-            getClass().getResourceAsStream("/file-icon.png"));
-    Image folderImage = new Image(
-            getClass().getResourceAsStream("/folder-icon.png"));
-    Image fileTile = new Image(
-            getClass().getResourceAsStream("/file-tile.png"));
-    Image folderTile = new Image(
-            getClass().getResourceAsStream("/folder-tile.png"));
-    public  static  SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+    private static  SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -260,32 +251,21 @@ public class Controller implements Initializable {
         treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
 
         vBox=new VBoxItem[item.getChildren().size()];
-        ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
         item.getChildren();
+        ObservableList<FilePathTreeItem> list = ChildArrayHelper.getChildren(item);
         int i=0;
-        if(!((FilePathTreeItem)treeView.getSelectionModel().getSelectedItem()).getAbsolutePath().equals(hostName)) {
-
-            for (FilePathTreeItem fileItem : item.childrenArray) {
-                Label label= new Label(fileItem.getFile().getName());
-                label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
-                try {
-                    vBox[i]=new VBoxItem(i,new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.BIG_ICON)),label,fileItem);
-                    i++;
-                } catch (Exception e) {
-                    vBox[i]=new VBoxItem(i,new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)),label,fileItem);
-                    i++;
-                    e.printStackTrace();
-                }
-            }
-        }
-        else
-        {
-            for (FilePathTreeItem fileItem : drives)
-            {
-                Label label= new Label(fileItem.getAbsolutePath());
-                label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
+        Label label;
+        for (FilePathTreeItem fileItem : list ) {
+            if(list==drives)label= new Label(fileItem.getAbsolutePath());
+            else label= new Label(fileItem.getFile().getName());
+            label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
+            try {
+                vBox[i]=new VBoxItem(i,new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.BIG_ICON)),label,fileItem);
+                i++;
+            } catch (Exception e) {
                 vBox[i]=new VBoxItem(i,new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)),label,fileItem);
                 i++;
+                e.printStackTrace();
             }
         }
         flowPane.getChildren().clear();
@@ -302,31 +282,20 @@ public class Controller implements Initializable {
 
         ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
         item.getChildren();
-        if(!((FilePathTreeItem)treeView.getSelectionModel().getSelectedItem()).getAbsolutePath().equals(hostName)) {
+        String name;
+        ObservableList<FilePathTreeItem> list = ChildArrayHelper.getChildren(item);
+        for (FilePathTreeItem fileItem : list) {
+            if(list==drives)name=fileItem.getAbsolutePath();
+            else name=fileItem.getFile().getName();
+            //System.out.println("Loading files "+fileItem.getFile().toString());
+            FileDetails fileDetails = new FileDetails(new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)),
+                    name,
+                    String.valueOf(fileItem.getFile().length()),
+                    String.valueOf(sdf.format(fileItem.getFile().lastModified())), fileItem);
+            //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
+            imgList.add(fileDetails);
+        }
 
-            for (FilePathTreeItem fileItem : item.childrenArray) {
-                //System.out.println("Loading files "+fileItem.getFile().toString());
-                FileDetails fileDetails = new FileDetails(new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)),
-                        fileItem.getFile().getName(),
-                        String.valueOf(fileItem.getFile().length()),
-                        String.valueOf(sdf.format(fileItem.getFile().lastModified())), fileItem);
-                //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
-                imgList.add(fileDetails);
-            }
-        }
-        else
-        {
-            for (FilePathTreeItem fileItem : drives)
-            {
-                //System.out.println("Loading files "+fileItem.getFile().toString());
-                FileDetails fileDetails = new FileDetails(new ImageView(ImageHelper.getIcon(fileItem,ImageHelper.SMALL_ICON)),
-                        fileItem.getFile().toString(),
-                        String.valueOf(fileItem.getFile().length()),
-                        String.valueOf(sdf.format(fileItem.getFile().lastModified())),fileItem);
-                //FileDetails item_2 = new FileDetails(new ImageView(writableImage),"File2","700kb","20-4-17");
-                imgList.add(fileDetails);
-            }
-        }
         tableView.getItems().clear();
         tableView.setItems(imgList);
         tCurrDir.setText(item.getAbsolutePath());
