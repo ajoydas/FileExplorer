@@ -3,7 +3,7 @@
  */
 public class MenuSetting {
     public String view;
-    public FilePathTreeItem currItem;
+    public FileTreeItem currItem;
     private static MenuSetting mSetting=null;
     private MenuSetting()
     {

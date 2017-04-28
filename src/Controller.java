@@ -38,11 +38,11 @@ public class Controller implements Initializable {
     private TableColumn tableName;
     private TableColumn tableSize;
     private TableColumn tableDate;
-    private FilePathTreeItem rootNode;
+    private FileTreeItem rootNode;
     public static String hostName="computer";
-    public  static ObservableList<FilePathTreeItem> drives=null;
+    public  static ObservableList<FileTreeItem> drives=null;
     public static VBoxItem[] vBox;
-    public  static  Stack<FilePathTreeItem> backlist;
+    public  static  Stack<FileTreeItem> backlist;
     private static  SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
 
     @Override
@@ -58,7 +58,7 @@ public class Controller implements Initializable {
         VBoxItem.flowPane=flowPane;
         VBoxItem.tableView=tableView;
 
-        FilePathTreeItem.textField=tCurrDir;
+        FileTreeItem.textField=tCurrDir;
         backlist=new Stack<>();
 
         System.out.println("Working Directory = " +System.getProperty("user.dir"));
@@ -69,13 +69,13 @@ public class Controller implements Initializable {
         drives=FXCollections.observableArrayList();
         Iterable<Path> rootDirectories= FileSystems.getDefault().getRootDirectories();
         for(Path name:rootDirectories){
-            FilePathTreeItem treeNode=new FilePathTreeItem(name.toFile());
+            FileTreeItem treeNode=new FileTreeItem(name.toFile());
             drives.add(treeNode);
         }
 
-        rootNode=new FilePathTreeItem(hostName);
+        rootNode=new FileTreeItem(hostName);
         treeView.setRoot(rootNode);
-        FilePathTreeItem currItem=getSpecificItem(System.getProperty("user.dir"));
+        FileTreeItem currItem= getItemFromAddress(System.getProperty("user.dir"));
         treeView.getSelectionModel().select(currItem);
         showItems(currItem);
 
@@ -123,7 +123,7 @@ public class Controller implements Initializable {
                 {
                     String input= tCurrDir.getText();
                     if(input.equals(hostName)) showItems(rootNode);
-                    else showItems(getSpecificItem(tCurrDir.getText()));
+                    else showItems(getItemFromAddress(tCurrDir.getText()));
                 }
         );
         tableView.setRowFactory( tv -> {
@@ -143,7 +143,7 @@ public class Controller implements Initializable {
         bBack.setOnMouseClicked(event ->
                 {
                     if(!backlist.empty()){
-                        FilePathTreeItem current= backlist.pop();
+                        FileTreeItem current= backlist.pop();
                         System.out.println("Stack Poped -> "+current.getAbsolutePath());
                         if(!backlist.empty()) {
                             current=backlist.pop();
@@ -168,7 +168,7 @@ public class Controller implements Initializable {
                     }
                     else if (!backlist.peek().getAbsolutePath().equals(hostName) && backlist.peek().getFile().getParent()!=null) {
                         System.out.println(" Parent : " + backlist.peek().getFile().getParent());
-                        FilePathTreeItem item = getSpecificItem(backlist.peek().getFile().getParent());
+                        FileTreeItem item = getItemFromAddress(backlist.peek().getFile().getParent());
                         showItems(item);
                         //addTileItems(item);
                     }
@@ -176,16 +176,16 @@ public class Controller implements Initializable {
         );
     }
 
-    private void addTileItems(FilePathTreeItem item) {
+    private void addTileItems(FileTreeItem item) {
         treeView.getSelectionModel().select(item);
         treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
 
         vBox=new VBoxItem[item.getChildren().size()];
         item.getChildren();
-        ObservableList<FilePathTreeItem> list = ChildArrayHelper.getChildren(item);
+        ObservableList<FileTreeItem> list = ChildArrayHelper.getChildren(item);
         int i=0;
         Label label;
-        for (FilePathTreeItem fileItem : list ) {
+        for (FileTreeItem fileItem : list ) {
             if(list==drives)label= new Label(fileItem.getAbsolutePath());
             else label= new Label(fileItem.getFile().getName());
             label.setPrefWidth(50);label.setMaxWidth(50);label.setMinWidth(50);label.setAlignment(Pos.CENTER);
@@ -206,15 +206,15 @@ public class Controller implements Initializable {
     }
 
 
-    private void addTableItems(FilePathTreeItem item) {
+    private void addTableItems(FileTreeItem item) {
         treeView.getSelectionModel().select(item);
         treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
 
         ObservableList<FileDetails> imgList = FXCollections.observableArrayList();
         item.getChildren();
         String name;
-        ObservableList<FilePathTreeItem> list = ChildArrayHelper.getChildren(item);
-        for (FilePathTreeItem fileItem : list) {
+        ObservableList<FileTreeItem> list = ChildArrayHelper.getChildren(item);
+        for (FileTreeItem fileItem : list) {
             if(list==drives)name=fileItem.getAbsolutePath();
             else name=fileItem.getFile().getName();
             //System.out.println("Loading files "+fileItem.getFile().toString());
@@ -234,10 +234,10 @@ public class Controller implements Initializable {
     }
 
 
-    private FilePathTreeItem getSpecificItem(String currDir) {
+    private FileTreeItem getItemFromAddress(String currDir) {
         boolean isDrive=true;
         StringTokenizer st = new StringTokenizer(currDir,"\\");
-        FilePathTreeItem fileItem=null;
+        FileTreeItem fileItem=null;
         String filename="";
         rootNode.setExpanded(true);
         while (st.hasMoreTokens()) {
@@ -246,8 +246,8 @@ public class Controller implements Initializable {
             if(isDrive) {
                 filename+="\\";
                 isDrive=false;
-                //ObservableList<FilePathTreeItem> children= rootNode.getChildren();
-                for (FilePathTreeItem item: drives)
+                //ObservableList<FileTreeItem> children= rootNode.getChildren();
+                for (FileTreeItem item: drives)
                 {
                     //System.out.println(item.getFile().toString());
                     if(item.getFile().toString().equals(filename))
@@ -261,7 +261,7 @@ public class Controller implements Initializable {
                 //System.out.println("In Else Item ");
                 fileItem.getChildren();
                 fileItem.setExpanded(true);
-                for (FilePathTreeItem item:fileItem.childrenArray)
+                for (FileTreeItem item:fileItem.childrenArray)
                 {
                     //System.out.println("In for loop "+item.getFile().toString());
                     if(item.getFile().toString().equals(filename))
@@ -278,14 +278,14 @@ public class Controller implements Initializable {
     }
 
 
-    public void mouseClicked(MouseEvent mouseEvent) {
+    public void treeViewMouseClicked(MouseEvent mouseEvent) {
         //System.out.println(((TreeItem)(treeView.getSelectionModel().getSelectedItem())).getValue());
-        FilePathTreeItem item = (FilePathTreeItem) treeView.getSelectionModel().getSelectedItem();
+        FileTreeItem item = (FileTreeItem) treeView.getSelectionModel().getSelectedItem();
         System.out.println(item.getAbsolutePath());
         showItems(item);
     }
 
-    private void showItems(FilePathTreeItem item)
+    private void showItems(FileTreeItem item)
     {
         MenuSetting.getInstance().currItem=item;
         System.out.println(MenuSetting.getInstance().currItem);

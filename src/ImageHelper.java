@@ -15,19 +15,19 @@ public class ImageHelper {
     public static final int SMALL_ICON=0;
     public static final int BIG_ICON=1;
 
-    public static WritableImage getIcon(FilePathTreeItem fileItem,int size) {
+    public static WritableImage getIcon(FileTreeItem fileItem, int size) {
         if (size==SMALL_ICON)return getSmallIcon(fileItem);
         else if(size==BIG_ICON) return getBigIcon(fileItem);
         return null;
     }
 
-    private static WritableImage getSmallIcon(FilePathTreeItem fileItem) {
+    private static WritableImage getSmallIcon(FileTreeItem fileItem) {
         ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(fileItem.getFile());
         java.awt.Image image = icon.getImage();
         BufferedImage bufferedImage = ImageHelper.toBufferedImage(image);
         return SwingFXUtils.toFXImage(bufferedImage, null);
     }
-    private static WritableImage getBigIcon(FilePathTreeItem fileItem) {
+    private static WritableImage getBigIcon(FileTreeItem fileItem) {
         ImageIcon icon=null;
         try {
             icon = new ImageIcon(sun.awt.shell.ShellFolder.getShellFolder( fileItem.getFile() ).getIcon( true ) );

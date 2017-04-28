@@ -8,9 +8,9 @@ public class FileDetails {
     private String fileName;
     private String size;
     private String Date;
-    private FilePathTreeItem item;
+    private FileTreeItem item;
 
-    public FileDetails(ImageView icon, String fileName, String size, String date, FilePathTreeItem item) {
+    public FileDetails(ImageView icon, String fileName, String size, String date, FileTreeItem item) {
         this.icon = icon;
         this.fileName = fileName;
         this.size = size;
@@ -50,11 +50,11 @@ public class FileDetails {
         Date = date;
     }
 
-    public FilePathTreeItem getItem() {
+    public FileTreeItem getItem() {
         return item;
     }
 
-    public void setItem(FilePathTreeItem item) {
+    public void setItem(FileTreeItem item) {
         this.item = item;
     }
 }

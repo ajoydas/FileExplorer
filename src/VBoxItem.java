@@ -19,7 +19,7 @@ import java.io.File;
  */
 public class VBoxItem extends VBox {
     public File file;
-    public FilePathTreeItem item;
+    public FileTreeItem item;
     String s;
     Label label;
     int pos;
@@ -28,7 +28,7 @@ public class VBoxItem extends VBox {
     public static FlowPane flowPane=null;
     public static TableView tableView=null;
     public static int lastClicked=-1;
-    VBoxItem(int pos,ImageView imageView,Label label,FilePathTreeItem item)
+    VBoxItem(int pos, ImageView imageView, Label label, FileTreeItem item)
     {
         super(imageView,label);
         setLayout();
@@ -60,9 +60,9 @@ public class VBoxItem extends VBox {
                     Controller.vBox=new VBoxItem[item.getChildren().size()];
                     item.getChildren();
                     int i=0;
-                    ObservableList<FilePathTreeItem> list = ChildArrayHelper.getChildren(item);
+                    ObservableList<FileTreeItem> list = ChildArrayHelper.getChildren(item);
                     Label label;
-                    for (FilePathTreeItem fileItem : item.childrenArray) {
+                    for (FileTreeItem fileItem : item.childrenArray) {
 
                         if(list==Controller.drives)label= new Label(fileItem.getAbsolutePath());
                         else label= new Label(fileItem.getFile().getName());
