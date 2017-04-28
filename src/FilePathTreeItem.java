@@ -35,32 +35,7 @@ public class FilePathTreeItem extends TreeItem<String>{
         this.isDirectory=file.isDirectory();
         if(this.isDirectory){
             this.setGraphic(new ImageView(folderImage));
-            //add event handlers
-            /*this.addEventHandler(TreeItem.branchCollapsedEvent(),new EventHandler(){
-                @Override
-                public void handle(Event e){
-                    FilePathTreeItem source=(FilePathTreeItem)e.getSource();
-                    //System.out.println(source.absolutePath);
-                    textField.setText(source.absolutePath);
-                    if(!source.isExpanded()){
-                        ImageView iv=(ImageView)source.getGraphic();
-                        iv.setImage(folderCollapseImage);
-                    }
-                }
-            } );
-            this.addEventHandler(TreeItem.branchExpandedEvent(),new EventHandler(){
-                @Override
-                public void handle(Event e){
-                    FilePathTreeItem source=(FilePathTreeItem)e.getSource();
-                    //System.out.println(source.absolutePath);
-                    textField.setText(source.absolutePath);
-                    if(source.isExpanded()){
-                        ImageView iv=(ImageView)source.getGraphic();
-                        iv.setImage(folderExpandImage);
-                    }
-                }
-            } );
-*/
+
         }else{
             this.setGraphic(new ImageView(fileImage));
         }
