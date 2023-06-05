@@ -7,6 +7,16 @@ In Windows os it is able to run from any folder and show the files of that folde
 
 It opens the file with the default application.
 
+User Interface:
+
+![Alt text](/Demo_images/mainview.JPG?raw=true "Main View")
+
+![Alt text](/Demo_images/mainviewTiles.JPG?raw=true "Main Tiles View")
+
+![Alt text](/Demo_images/view2.JPG?raw=true "Another Details View")
+
+![Alt text](/Demo_images/view2tiles.JPG?raw=true "Another Tiles View")
+
 # Documentation:
 **Part 1: Classes:**
 
@@ -87,12 +97,3 @@ Composite Pattern:
 
 
 
-User Interface:
-
-![Alt text](/Demo_images/mainview.JPG?raw=true "Main View")
-
-![Alt text](/Demo_images/mainviewTiles.JPG?raw=true "Main Tiles View")
-
-![Alt text](/Demo_images/view2.JPG?raw=true "Another Details View")
-
-![Alt text](/Demo_images/view2tiles.JPG?raw=true "Another Tiles View")
